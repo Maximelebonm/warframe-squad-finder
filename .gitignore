@@ -1,0 +1,32 @@
+node_modules
+.DS_Store
+dist
+dist-ssr
+*.local
+
+# Env
+.env
+.env.*
+!.env.example
+
+# Build outputs
+.nitro
+.tanstack
+.wrangler
+.output
+.vinxi
+__unconfig*
+
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Editor
+.vscode/
+.idea/
+
+# Misc
+todos.json
+.cache
