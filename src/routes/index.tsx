@@ -13,11 +13,151 @@ export const Route = createFileRoute('/')({
 
 function HomePage() {
 
+  const [query, setQuery] = useState('')
+  const [selectedItemId, setSelectedItemId] = useState<number | null>(null)
+  const { data: session } = authClient.useSession()
 
+  const { data: searchResults } = useQuery({
+    queryKey: ['items', query],
+    queryFn: () => searchItems({ data: query }),
+    enabled: query.length >= 2,
+  })
+
+  const { data: listingsData } = useQuery({
+    queryKey: ['listings', selectedItemId],
+    queryFn: () => getListings({ data: selectedItemId! }),
+    enabled: selectedItemId !== null,
+  })
+
+  const { data: recentListings } = useQuery({
+  queryKey: ['recent-listings'],
+  queryFn: () => fetchRecentListings (),
+  })
+
+  const havePlayers = listingsData?.filter((l) => l.mode === 'have') ?? []
+  const wantPlayers = listingsData?.filter((l) => l.mode === 'want') ?? []
 
   return (
     <div className="max-w-3xl mx-auto p-8 space-y-6">
-        hello
+      <div>
+        <h1 className="text-3xl font-bold">Warframe Squad Finder</h1>
+        <p className="text-muted-foreground mt-2">
+          Trouve des joueurs pour ouvrir tes reliques
+        </p>
+      </div>
+
+      {/* Barre de recherche */}
+      <Input
+        placeholder="Recherche une relique... ex: Lith V6"
+        value={query}
+        onChange={(e) => {
+          setQuery(e.target.value)
+          setSelectedItemId(null)
+        }}
+      />
+
+      {/* Résultats de recherche */}
+      {searchResults && searchResults.length > 0 && !selectedItemId && (
+        <div className="border rounded-lg divide-y">
+          {searchResults.map((item) => (
+            <button
+              key={item.id}
+              className="w-full text-left px-4 py-3 hover:bg-muted transition-colors"
+              onClick={() => {
+                setSelectedItemId(item.id)
+                setQuery(item.name)
+              }}
+            >
+              <span className="font-medium">{item.name}</span>
+              {item.tier && (
+                <span className="ml-2 text-sm text-muted-foreground">{item.tier}</span>
+              )}
+              {item.vaulted && (
+                <span className="ml-2 text-xs text-orange-500">Vaulted</span>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Listings */}
+      {selectedItemId && listingsData && (
+        <div className="space-y-6">
+          {/* Joueurs qui ont la relique */}
+          <div>
+            <h2 className="text-xl font-semibold mb-3">
+              Joueurs qui ont cette relique ({havePlayers.length})
+            </h2>
+            {havePlayers.length === 0 ? (
+              <p className="text-muted-foreground">Aucun joueur disponible</p>
+            ) : (
+              <div className="border rounded-lg divide-y">
+                {havePlayers.map((listing) => {
+                  const alias = listing.user.profile.warframeAlias || listing.user.name
+                  return (
+                    <ListingRow
+                      key={listing.id}
+                      listing={listing}
+                      alias={alias}
+                      itemName={listing.item.name || ''}  // adapte selon ta structure
+                      session={session} 
+                    />
+                  )
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Joueurs qui cherchent la relique */}
+          <div>
+            <h2 className="text-xl font-semibold mb-3">
+              Joueurs qui cherchent cette relique ({wantPlayers.length})
+            </h2>
+            {wantPlayers.length === 0 ? (
+              <p className="text-muted-foreground">Aucun joueur ne cherche cette relique</p>
+            ) : (
+              <div className="border rounded-lg divide-y">
+                {wantPlayers.map((listing) => {
+                  const alias = listing.user.profile.warframeAlias || listing.user.name
+                  return (
+                    <ListingRow
+                      key={listing.id}
+                      listing={listing}
+                      alias={alias}
+                      itemName={listing.item.name}
+                      session={session} 
+                    />
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {!selectedItemId && (
+  <div className="space-y-4">
+    <h2 className="text-xl font-semibold">Annonces récentes</h2>
+    {!recentListings || recentListings.length === 0 ? (
+      <p className="text-muted-foreground">Aucune annonce pour le moment</p>
+    ) : (
+      <div className="border rounded-lg divide-y">
+        {recentListings.map((listing) => {
+          const alias = listing.user.profile.warframeAlias || listing.user.name
+          return (
+            <ListingRow
+              key={listing.id}
+              listing={listing}
+              alias={alias}
+              itemName={listing.item.name}
+              session={session}
+            />
+          )
+        })}
+      </div>
+    )}
+  </div>
+)}
     </div>
   )
 }
