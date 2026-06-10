@@ -11,6 +11,12 @@ import { fetchUnreadCount } from '#/functions/messages'
 export function Navbar() {
   const router = useRouter()
   const queryClient = useQueryClient()
+  const [mounted, setMounted] = useState(false)
+  
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+  
   const { data: session } = authClient.useSession()
 
   const [timeLeft, setTimeLeft] = useState<number | null>(null)
@@ -90,7 +96,7 @@ useEffect(() => {
     <nav className="border-b px-6 py-3 flex items-center justify-between">
       <div className="flex items-center gap-6">
         <Link to="/" className="font-bold text-lg">WSF</Link>
-        {session && (
+        {mounted && session && (
           <>
           <Link
             to="/my-listings"
@@ -174,7 +180,7 @@ useEffect(() => {
           </div>
         )}
 
-        {session ? (
+        {mounted && session ? (
           <>
             <Link
               to="/profile"
