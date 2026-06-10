@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '#
 import { Switch } from '#/components/ui/switch'
 
 export const Route = createFileRoute('/my-listings')({
+      ssr: false,
   component: MyListingsPage,
 })
 

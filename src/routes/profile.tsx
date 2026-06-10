@@ -8,6 +8,7 @@ import { Label } from '#/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '#/components/ui/select'
 
 export const Route = createFileRoute('/profile')({
+      ssr: false,
   component: ProfilePage,
 })
 
@@ -18,6 +19,7 @@ function ProfilePage() {
   const [status, setStatus] = useState('offline')
 
 const { data: profile, isLoading } = useQuery({
+  
   queryKey: ['profile'],
   queryFn: () => getProfile(),
 })
