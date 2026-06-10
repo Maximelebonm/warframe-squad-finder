@@ -10,6 +10,9 @@ import neon from './neon-vite-plugin.ts'
 
 const config = defineConfig({
   resolve: { tsconfigPaths: true },
+    ssr: {
+    noExternal: ['better-auth'],
+  },
   plugins: [
     devtools(),
     nitro({ rollupConfig: {
