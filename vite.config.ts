@@ -12,7 +12,8 @@ const config = defineConfig({
   resolve: { tsconfigPaths: true },
   plugins: [
     devtools(),
-    nitro({ rollupConfig: { 
+    nitro({ rollupConfig: {
+      preset: 'vercel', 
       external: [/^@sentry\//,/@better-auth\/kysely-adapter/, /kysely/], } }),
     neon,
     tailwindcss(),
