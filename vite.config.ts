@@ -16,7 +16,10 @@ const config = defineConfig({
   plugins: [
     devtools(),
     nitro({ rollupConfig: {
-      external: [/^@sentry\//,/@better-auth\/kysely-adapter/, /kysely/], } }),
+      external: [/^@sentry\//,/@better-auth\/kysely-adapter/, /kysely/], 
+      serverExternals: ['drizzle-orm', '@neondatabase/serverless'],
+    }
+    }),
     neon,
     tailwindcss(),
     tanstackStart(),
