@@ -39,7 +39,7 @@
     "drizzle-kit": "^0.31.9",
     "drizzle-orm": "^0.45.1",
     "lucide-react": "^0.577.0",
-    "nitropack": "^2.13.4",
+    "nitro": "3.0.260603-beta",
     "pg": "^8.16.3",
     "radix-ui": "^1.5.0",
     "react": "^19.2.0",
