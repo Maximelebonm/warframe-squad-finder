@@ -13,7 +13,6 @@ const config = defineConfig({
   plugins: [
     devtools(),
     nitro({ rollupConfig: {
-      preset: 'vercel', 
       external: [/^@sentry\//,/@better-auth\/kysely-adapter/, /kysely/], } }),
     neon,
     tailwindcss(),
