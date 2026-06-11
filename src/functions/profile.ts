@@ -17,7 +17,30 @@ export const getProfile = createServerFn({ method: 'GET' })
     where: eq(profile.id, session.user.id),
   })
 
-  return result ?? null
+  if (!result) return null
+
+  if (
+    result.status !== 'offline' &&
+    result.statusExpiresAt &&
+    result.statusExpiresAt < new Date()
+  ) {
+    await db
+      .update(profile)
+      .set({
+        status: 'offline',
+        statusExpiresAt: null,
+        updatedAt: new Date(),
+      })
+      .where(eq(profile.id, session.user.id))
+
+    return {
+      ...result,
+      status: 'offline',
+      statusExpiresAt: null,
+    }
+  }
+
+  return result
 })
 
 export const upsertProfile = createServerFn({ method: 'POST' })
