@@ -1,9 +1,10 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate,useRouter,Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { MessageCircle, Copy, Check, Mail } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { searchItems, getListings, fetchRecentListings   } from '#/functions/listings'
 import { Input } from '#/components/ui/input'
+import { Button } from '#/components/ui/button'
 import { authClient } from '#/lib/auth-client'
 
 export const Route = createFileRoute('/')({
@@ -208,8 +209,10 @@ function ListingRow({ listing, alias, itemName,session}: {
   session : any
 }) {
   const [showMessage, setShowMessage] = useState(false)
-  const navigate = useNavigate()
+  const [showAuthModal, setShowAuthModal] = useState(false)
 
+  const navigate = useNavigate()
+  const router = useRouter()
 
   return (
     <div className="px-4 py-3">
@@ -239,6 +242,7 @@ function ListingRow({ listing, alias, itemName,session}: {
           </button>
            <button
                 onClick={() => {
+                  if (!session) { setShowAuthModal(true); return }
                   if (listing.user.id === session?.user.id) return
                   navigate({ 
                     to: '/messages',
@@ -257,6 +261,27 @@ function ListingRow({ listing, alias, itemName,session}: {
         </div>
       </div>
       {showMessage && <ContactMessage alias={alias} itemName={itemName} />}
+      {showAuthModal && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowAuthModal(false)}>
+    <div className="bg-card border rounded-lg p-6 space-y-4 max-w-sm w-full mx-4" onClick={e => e.stopPropagation()}>
+      <h2 className="text-xl font-semibold">Connexion requise</h2>
+      <p className="text-muted-foreground">
+        Tu dois avoir un compte pour contacter un joueur ici. Si il est en ligne clique sur la bulle et copie colle le message ! 
+      </p>
+      <div className="flex gap-3">
+        <Link to="/register" className="flex-1">
+          <Button className="w-full">Créer un compte</Button>
+        </Link>
+        <Link to="/login" className="flex-1">
+          <Button variant="outline" className="w-full">Se connecter</Button>
+        </Link>
+      </div>
+      <button onClick={() => setShowAuthModal(false)} className="w-full text-sm text-muted-foreground hover:text-foreground">
+        Annuler
+      </button>
+    </div>
+  </div>
+)}
     </div>
   )
 }

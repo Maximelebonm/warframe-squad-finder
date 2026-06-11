@@ -77,7 +77,7 @@ useEffect(() => {
             </Select>
           </div>
 
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <Label>Statut</Label>
             <Select value={status} onValueChange={setStatus}>
               <SelectTrigger>
@@ -89,7 +89,7 @@ useEffect(() => {
                 <SelectItem value="available">Disponible</SelectItem>
               </SelectContent>
             </Select>
-          </div>
+          </div> */}
 
           <Button
             className="w-full"

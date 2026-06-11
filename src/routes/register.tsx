@@ -16,6 +16,7 @@ function RegisterPage() {
   const [name, setName] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [emailSent, setEmailSent] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -34,7 +35,8 @@ function RegisterPage() {
       return
     }
 
-    router.navigate({ to: '/' })
+    setEmailSent(true)
+    setLoading(false)
   }
 
   return (
@@ -46,10 +48,23 @@ function RegisterPage() {
             Crée ton compte Warframe Squad Finder
           </p>
         </div>
-
+        {emailSent ? (
+          <div className="text-center space-y-3 py-6">
+            <div className="text-4xl">📧</div>
+            <h2 className="text-xl font-semibold">Vérifie ta boîte mail</h2>
+            <p className="text-muted-foreground text-sm">
+              Un lien de confirmation a été envoyé à <span className="font-medium text-foreground">{email}</span>.
+              Clique dessus pour activer ton compte.
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Tu ne vois pas l'email ? Vérifie tes spams.
+            </p>
+          </div>
+        ) : (
+        <>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Pseudo</Label>
+            <Label htmlFor="name">Pseudo d'utilisateur (peut être different de ton alias warframe)</Label>
             <Input
               id="name"
               type="text"
@@ -92,7 +107,8 @@ function RegisterPage() {
             {loading ? 'Inscription...' : "S'inscrire"}
           </Button>
         </form>
-
+      </>
+      )}
         <p className="text-center text-sm text-muted-foreground">
           Déjà un compte ?{' '}
           <Link to="/login" className="text-primary hover:underline">

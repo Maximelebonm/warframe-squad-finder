@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { Pencil, Check, X } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -8,6 +8,7 @@ import { Input } from '#/components/ui/input'
 import { Label } from '#/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '#/components/ui/select'
 import { Switch } from '#/components/ui/switch'
+import { getProfile } from '#/functions/profile'
 
 export const Route = createFileRoute('/my-listings')({
       ssr: false,
@@ -28,6 +29,11 @@ function MyListingsPage() {
     queryFn: () => searchItems({ data: query }),
     enabled: query.length >= 2,
   })
+
+  const { data: profile, isLoading: profileLoading } = useQuery({
+  queryKey: ['profile'],
+  queryFn: () => getProfile(),
+})
 
   const { data: myListings } = useQuery({
     queryKey: ['my-listings'],
@@ -75,6 +81,23 @@ onSuccess: () => {
   })
 
   
+if (profileLoading) return <div className="p-8">Chargement...</div>
+
+if (!profile?.warframeAlias) {
+  return (
+    <div className="max-w-3xl mx-auto p-8 space-y-4">
+      <h1 className="text-3xl font-bold">Mes annonces</h1>
+      <div className="border rounded-lg p-6 space-y-4 text-center">
+        <p className="text-muted-foreground">
+          Tu dois configurer ton profil Warframe avant de créer des annonces.
+        </p>
+        <Link to="/profile">
+          <Button>Configurer mon profil</Button>
+        </Link>
+      </div>
+    </div>
+  )
+}
 
   return (
     <div className="max-w-3xl mx-auto p-8 space-y-10">

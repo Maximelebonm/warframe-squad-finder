@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useRouter  } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { fetchConversations, fetchMessages, sendMessage, getOrCreateConversation } from '#/functions/messages'
@@ -15,10 +15,20 @@ export const Route = createFileRoute('/messages')({
 
 function MessagesPage() {
   const queryClient = useQueryClient()
-  const { data: session } = authClient.useSession()
+  const { data: session, isPending } = authClient.useSession()
+  const router = useRouter()
   const [selectedConvId, setSelectedConvId] = useState<number | null>(null)
   const [content, setContent] = useState('')
   const { recipientId } = Route.useSearch()
+
+  useEffect(() => {
+  if (!isPending && !session) {
+    router.navigate({ to: '/login' })
+  }
+}, [session, isPending])
+
+if (isPending) return <div className="p-8">Chargement...</div>
+if (!session) return null
 
   useEffect(() => {
   if (!recipientId) return
@@ -122,7 +132,7 @@ function MessagesPage() {
               {/* Messages */}
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {msgs?.map(msg => {
-                  const isMe = msg.senderId === session?.user.id
+                  const isMe = msg.senderId === session.user.id
                   return (
                     <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                       <div className={`max-w-xs px-3 py-2 rounded-lg text-sm ${isMe ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
