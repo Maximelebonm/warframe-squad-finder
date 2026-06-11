@@ -22,7 +22,7 @@ function MessagesPage() {
 
   useEffect(() => {
   if (!recipientId) return
-  getOrCreateConversation({ data: recipientId }).then(({ conversationId }) => {
+  getOrCreateConversation({ data: recipientId }).then(({ conversationId }: { conversationId: number }) => {
     setSelectedConvId(conversationId)
     queryClient.invalidateQueries({ queryKey: ['conversations'] })
   })

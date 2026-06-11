@@ -10,14 +10,13 @@ import neon from './neon-vite-plugin.ts'
 
 const config = defineConfig({
   resolve: { tsconfigPaths: true },
-    ssr: {
-    noExternal: ['better-auth'],
-  },
+ssr: {
+  noExternal: ['better-auth', 'drizzle-orm', '@neondatabase/serverless'],
+},
   plugins: [
     devtools(),
     nitro({ rollupConfig: {
       external: [/^@sentry\//,/@better-auth\/kysely-adapter/, /kysely/], 
-      serverExternals: ['drizzle-orm', '@neondatabase/serverless'],
     }
     }),
     neon,
