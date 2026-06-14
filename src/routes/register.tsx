@@ -53,6 +53,16 @@ function RegisterPage() {
   return null
 }
 
+const [resendLoading, setResendLoading] = useState(false)
+const [resendSuccess, setResendSuccess] = useState(false)
+
+async function handleResend() {
+  setResendLoading(true)
+  await authClient.sendVerificationEmail({ email })
+  setResendSuccess(true)
+  setResendLoading(false)
+}
+
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="w-full max-w-md p-8 space-y-6">
@@ -70,9 +80,18 @@ function RegisterPage() {
               Un lien de confirmation a été envoyé à <span className="font-medium text-foreground">{email}</span>.
               Clique dessus pour activer ton compte.
             </p>
-            <p className="text-xs text-muted-foreground">
-              Tu ne vois pas l'email ? Vérifie tes spams.
-            </p>
+            <p className="text-xs text-muted-foreground">Tu ne vois pas l'email ? Vérifie tes spams.</p>
+            {resendSuccess ? (
+              <p className="text-sm text-green-600">Email renvoyé !</p>
+            ) : (
+              <button
+                onClick={handleResend}
+                disabled={resendLoading}
+                className="text-sm text-primary hover:underline"
+              >
+                {resendLoading ? 'Envoi...' : "Renvoyer l'email"}
+              </button>
+            )}
           </div>
         ) : (
         <>
