@@ -15,11 +15,21 @@ function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [resetSent, setResetSent] = useState(false)
+  const [resetLoading, setResetLoading] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
     setError('')
+
+    const pwdError = validatePassword(password)
+
+    if (pwdError) {
+    setError(pwdError)
+    setLoading(false)
+    return
+  }
 
     const { error : authError } = await authClient.signIn.email({
       email,
@@ -34,6 +44,25 @@ function LoginPage() {
 
     router.navigate({ to: '/' })
   }
+
+    function validatePassword(pwd: string): string | null {
+  if (pwd.length < 8) return 'Au moins 8 caractères'
+  if (!/[A-Z]/.test(pwd)) return 'Au moins une majuscule'
+  if (!/[0-9]/.test(pwd)) return 'Au moins un chiffre'
+  if (!/[^a-zA-Z0-9]/.test(pwd)) return 'Au moins un caractère spécial'
+  return null
+  }
+
+  async function handleForgotPassword() {
+  if (!email) {
+    setError('Entre ton email d\'abord')
+    return
+  }
+  setResetLoading(true)
+  await authClient.requestPasswordReset({ email, redirectTo: '/reset-password' })
+  setResetSent(true)
+  setResetLoading(false)
+}
 
   return (
     <div className="min-h-screen flex items-center justify-center">
@@ -70,6 +99,22 @@ function LoginPage() {
             />
           </div>
 
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={handleForgotPassword}
+              disabled={resetLoading}
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {resetLoading ? 'Envoi...' : 'Mot de passe oublié ?'}
+            </button>
+          </div>
+
+          {resetSent && (
+            <p className="text-sm text-green-600">
+              Email de réinitialisation envoyé à {email} !
+            </p>
+          )}
           {error && (
             <p className="text-sm text-red-500">{error}</p>
           )}

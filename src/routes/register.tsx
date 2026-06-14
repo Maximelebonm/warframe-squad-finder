@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { authClient } from '#/lib/auth-client'
 import { Button } from '#/components/ui/button'
@@ -10,7 +10,6 @@ export const Route = createFileRoute('/register')({
 })
 
 function RegisterPage() {
-  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
@@ -22,6 +21,13 @@ function RegisterPage() {
     e.preventDefault()
     setLoading(true)
     setError('')
+
+    const pwdError = validatePassword(password)
+  if (pwdError) {
+    setError(pwdError)
+    setLoading(false)
+    return
+  }
 
     const { error : authError } = await authClient.signUp.email({
       email,
@@ -38,6 +44,14 @@ function RegisterPage() {
     setEmailSent(true)
     setLoading(false)
   }
+
+  function validatePassword(pwd: string): string | null {
+  if (pwd.length < 8) return 'Au moins 8 caractères'
+  if (!/[A-Z]/.test(pwd)) return 'Au moins une majuscule'
+  if (!/[0-9]/.test(pwd)) return 'Au moins un chiffre'
+  if (!/[^a-zA-Z0-9]/.test(pwd)) return 'Au moins un caractère spécial'
+  return null
+}
 
   return (
     <div className="min-h-screen flex items-center justify-center">
@@ -97,6 +111,9 @@ function RegisterPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+            <p className="text-xs text-muted-foreground">
+              8 caractères min, une majuscule, un chiffre, un caractère spécial
+            </p> 
           </div>
 
           {error && (

@@ -21,6 +21,14 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
+    sendResetPassword: async ({ user: emailUser, url }) => {
+      await resend.emails.send({
+        from: 'WSF <noreply@warframe-squad-finder.com>',
+        to: emailUser.email,
+        subject: 'Réinitialisation de ton mot de passe',
+        html: `<p>Clique sur ce lien pour réinitialiser ton mot de passe : <a href="${url}">${url}</a></p>`,
+      })
+    },
   },
    emailVerification: {
     sendVerificationEmail: async ({ user: emailUser, url }) => {
@@ -32,6 +40,11 @@ export const auth = betterAuth({
       })
     },
     autoSignInAfterVerification: true,
+  },
+  user: {
+    deleteUser: {
+      enabled: true,
+    },
   },
   plugins: [tanstackStartCookies()],
 })
