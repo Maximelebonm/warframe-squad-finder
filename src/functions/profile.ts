@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 import { db } from '../db'
-import { profile } from '../db/schema'
+import { profile, user as userTable } from '../db/schema'
 import { eq } from 'drizzle-orm'
 import { auth } from '../lib/auth'
 import { getRequest } from '@tanstack/react-start/server'
@@ -43,6 +43,24 @@ export const getProfile = createServerFn({ method: 'GET' })
   return result
 })
 
+export const checkUsernameAvailable = createServerFn({ method: 'GET' })
+  .validator((name: string) => name)
+  .handler(async ({ data: name }) => {
+    const existing = await db.query.user.findFirst({
+      where: eq(userTable.name, name),
+    })
+    return { available: !existing }
+  })
+
+export const checkAliasAvailable = createServerFn({ method: 'GET' })
+  .validator((alias: string) => alias)
+  .handler(async ({ data: alias }) => {
+    const existing = await db.query.profile.findFirst({
+      where: eq(profile.warframeAlias, alias),
+    })
+    return { available: !existing }
+  })
+
 export const upsertProfile = createServerFn({ method: 'POST' })
   .validator((data: { warframeAlias: string; platform: string; status: string }) => data)
   .handler(async ({ data }) => {
@@ -51,6 +69,14 @@ export const upsertProfile = createServerFn({ method: 'POST' })
 
     if (!session) throw new Error('Non authentifié')
 
+      const existing = await db.query.profile.findFirst({
+      where: eq(profile.warframeAlias, data.warframeAlias),
+    })
+
+        if (existing && existing.id !== session.user.id) {
+      throw new Error('Cet alias Warframe est déjà utilisé')
+    }
+    
     await db
       .insert(profile)
       .values({

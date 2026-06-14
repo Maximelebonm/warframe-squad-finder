@@ -7,6 +7,7 @@ import { Button } from '#/components/ui/button'
 import { Input } from '#/components/ui/input'
 import { Label } from '#/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '#/components/ui/select'
+import { checkAliasAvailable } from './../functions/profile';
 
 export const Route = createFileRoute('/profile')({
   ssr: false,
@@ -23,6 +24,7 @@ function ProfilePage() {
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [passwordError, setPasswordError] = useState('')
+  const [AliasError, setAliasError] = useState('')
   const [passwordSuccess, setPasswordSuccess] = useState(false)
   const [passwordLoading, setPasswordLoading] = useState(false)
 
@@ -50,6 +52,7 @@ function ProfilePage() {
     mutationFn: (data: { warframeAlias: string; platform: string; status: string }) =>
       upsertProfile({ data }),
     onSuccess: () => router.navigate({ to: '/' }),
+    onError: (error: Error) => setAliasError(error.message),
   })
 
   function validatePassword(pwd: string): string | null {
@@ -148,7 +151,7 @@ function ProfilePage() {
           </Button>
 
           {mutation.isError && (
-            <p className="text-sm text-red-500">Une erreur est survenue</p>
+            <p className="text-sm text-red-500">{AliasError}</p>
           )}
         </section>
 
