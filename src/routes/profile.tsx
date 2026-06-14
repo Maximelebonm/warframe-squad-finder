@@ -7,7 +7,7 @@ import { Button } from '#/components/ui/button'
 import { Input } from '#/components/ui/input'
 import { Label } from '#/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '#/components/ui/select'
-import { checkAliasAvailable } from './../functions/profile';
+// import { checkAliasAvailable } from './../functions/profile';
 
 export const Route = createFileRoute('/profile')({
   ssr: false,
@@ -33,20 +33,28 @@ function ProfilePage() {
   const [deleteError, setDeleteError] = useState('')
   const [deleteLoading, setDeleteLoading] = useState(false)
 
+  const { data: session } = authClient.useSession()
+
   const { data: profile, isLoading } = useQuery({
     queryKey: ['profile'],
     queryFn: () => getProfile(),
   })
 
   useEffect(() => {
-    if (!isLoading && !profile) {
-      router.navigate({ to: '/' })
-    }
-    if (profile) {
-      setWarframeAlias(profile.warframeAlias)
-      setPlatform(profile.platform ?? 'pc')
-    }
-  }, [profile, isLoading])
+    if (isLoading) return
+  if (!session?.user) {
+    router.navigate({ to: '/login' })
+    return
+  }
+  if (!session.user.emailVerified) {
+    router.navigate({ to: '/login' })
+    return
+  }
+  if (profile) {
+    setWarframeAlias(profile.warframeAlias)
+    setPlatform(profile.platform ?? 'pc')
+  }
+  }, [profile, isLoading, session])
 
   const mutation = useMutation({
     mutationFn: (data: { warframeAlias: string; platform: string; status: string }) =>

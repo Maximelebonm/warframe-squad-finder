@@ -4,7 +4,7 @@ import { authClient } from '#/lib/auth-client'
 import { Button } from '#/components/ui/button'
 import { Input } from '#/components/ui/input'
 import { Label } from '#/components/ui/label'
-import { checkUsernameAvailable } from '#/functions/profile'
+import { checkUsernameAvailable, checkEmailAvailable } from '#/functions/profile'
 
 export const Route = createFileRoute('/register')({
   component: RegisterPage,
@@ -30,9 +30,13 @@ function RegisterPage() {
     return
   }
 
-   const { available } = await checkUsernameAvailable({ data: name })
-  if (!available) { setError('Ce pseudo est déjà pris'); setLoading(false); return }
+  const [{ available: emailOk }, { available: nameOk }] = await Promise.all([
+    checkEmailAvailable({ data: email }),
+    checkUsernameAvailable({ data: name }),
+  ])
 
+  if (!emailOk) { setError('Un compte existe déjà avec cet email'); setLoading(false); return }
+  if (!nameOk) { setError('Ce pseudo est déjà pris'); setLoading(false); return }
 
     const { error : authError } = await authClient.signUp.email({
       email,

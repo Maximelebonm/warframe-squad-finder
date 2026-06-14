@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { db } from '../db'
 import { profile, user as userTable } from '../db/schema'
-import { eq } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 import { auth } from '../lib/auth'
 import { getRequest } from '@tanstack/react-start/server'
 
@@ -47,7 +47,7 @@ export const checkUsernameAvailable = createServerFn({ method: 'GET' })
   .validator((name: string) => name)
   .handler(async ({ data: name }) => {
     const existing = await db.query.user.findFirst({
-      where: eq(userTable.name, name),
+      where: sql`lower(${userTable.name}) = lower(${name})`,
     })
     return { available: !existing }
   })
@@ -56,7 +56,7 @@ export const checkAliasAvailable = createServerFn({ method: 'GET' })
   .validator((alias: string) => alias)
   .handler(async ({ data: alias }) => {
     const existing = await db.query.profile.findFirst({
-      where: eq(profile.warframeAlias, alias),
+      where: sql`lower(${profile.warframeAlias}) = lower(${alias})`,
     })
     return { available: !existing }
   })
@@ -69,14 +69,14 @@ export const upsertProfile = createServerFn({ method: 'POST' })
 
     if (!session) throw new Error('Non authentifié')
 
-      const existing = await db.query.profile.findFirst({
-      where: eq(profile.warframeAlias, data.warframeAlias),
+    const existing = await db.query.profile.findFirst({
+      where: sql`lower(${profile.warframeAlias}) = lower(${data.warframeAlias})`,
     })
 
-        if (existing && existing.id !== session.user.id) {
+    if (existing && existing.id !== session.user.id) {
       throw new Error('Cet alias Warframe est déjà utilisé')
     }
-    
+
     await db
       .insert(profile)
       .values({
@@ -119,4 +119,13 @@ export const upsertProfile = createServerFn({ method: 'POST' })
       .where(eq(profile.id, session.user.id))
 
     return { success: true }
+  })
+
+  export const checkEmailAvailable = createServerFn({ method: 'GET' })
+  .validator((email: string) => email)
+  .handler(async ({ data: email }) => {
+    const existing = await db.query.user.findFirst({
+      where: sql`lower(${userTable.email}) = lower(${email})`,
+    })
+    return { available: !existing }
   })

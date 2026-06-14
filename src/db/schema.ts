@@ -51,7 +51,7 @@ export const verification = pgTable('verification', {
 // ---- App tables ----
 export const profile = pgTable('profile', {
   id: text().primaryKey().references(() => user.id, { onDelete: 'cascade' }),
-  warframeAlias: text('warframe_alias').notNull(),
+  warframeAlias: text('warframe_alias').notNull().unique(),
   platform: text().default('pc'), // pc, ps, xbox, switch
   status: text().default('offline'), // offline, online, available
   statusExpiresAt: timestamp('status_expires_at'), 
