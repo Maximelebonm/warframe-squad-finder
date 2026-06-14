@@ -58,25 +58,52 @@ export const profile = pgTable('profile', {
   updatedAt: timestamp('updated_at').defaultNow(),
 })
 
-export const items = pgTable('items', {
+export const relics = pgTable('relics', {
   id: serial().primaryKey(),
-  name: text().notNull().unique(),   // "Axi A1", "Morphics", "Vitality"
-  type: text().notNull(),            // "relic", "resource", "mod", "blueprint"
-  tier: text(),                      // "Lith", "Meso", "Neo", "Axi" (null si pas relic)
-  vaulted: boolean().default(false), // uniquement utile pour les reliques
+  name: text().notNull().unique(),
+  tier: text(),                      // Lith, Meso, Neo, Axi
+  vaulted: boolean().default(false),
   imageUrl: text('image_url'),
+})
+
+export const mods = pgTable('mods', {
+  id: serial().primaryKey(),
+  name: text().notNull().unique(),
+})
+
+export const resources = pgTable('resources', {
+  id: serial().primaryKey(),
+  name: text().notNull().unique(),
+  category: text(),                  // Orokin, Grineer, Infested, Corpus...
 })
 
 export const listings = pgTable('listings', {
   id: serial().primaryKey(),
   userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
-  itemId: integer('item_id').notNull().references(() => items.id),
-  mode: text().notNull(),            // "have" ou "want"
-  quality: text(),                   // intact/exceptional/flawless/radiant (null si pas relic)
+  category: text().notNull(),        // 'relic' | 'mod' | 'resource' | 'taxi'
+  relicId: integer('relic_id').references(() => relics.id),
+  modId: integer('mod_id').references(() => mods.id),
+  resourceId: integer('resource_id').references(() => resources.id),          // 'have' | 'want'
+  quality: text(),                   // intact/exceptional/flawless/radiant (relics only)
   quantity: integer().default(1),
   isActive: boolean('is_active').default(true),
-  note: text(),                      // "dispo après 20h"
+  note: text(),
   createdAt: timestamp('created_at').defaultNow(),
+})
+
+export const listingCategories = pgTable('listing_categories', {
+  id: serial().primaryKey(),
+  name: text().notNull().unique(),   // 'relic', 'mod', 'resource', 'taxi'
+  label: text().notNull(),           // 'Reliques', 'Mods', 'Ressources', 'Taxi'
+})
+
+export const taxiListings = pgTable('taxi_listings', {
+  id: serial().primaryKey(),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  steelPath: boolean('steel_path').default(false),
+  isAvailable: boolean('is_available').default(false),
+  note: text(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 })
 
 // Messagerie
@@ -98,6 +125,8 @@ export const messages = pgTable('messages', {
 })
 // 
 
+// RELATIONS
+
 export const userRelations = relations(user, ({ one, many }) => ({
   profile: one(profile, {
     fields: [user.id],
@@ -116,19 +145,28 @@ export const profileRelations = relations(profile, ({ one }) => ({
 }))
 
 export const listingsRelations = relations(listings, ({ one }) => ({
-  user: one(user, {
-    fields: [listings.userId],
-    references: [user.id],
-  }),
-  item: one(items, {
-    fields: [listings.itemId],
-    references: [items.id],
-  }),
+  user: one(user, { fields: [listings.userId], references: [user.id] }),
+  relic: one(relics, { fields: [listings.relicId], references: [relics.id] }),
+  mod: one(mods, { fields: [listings.modId], references: [mods.id] }),
+  resource: one(resources, { fields: [listings.resourceId], references: [resources.id] }),
 }))
 
-export const itemsRelations = relations(items, ({ many }) => ({
+export const relicsRelations = relations(relics, ({ many }) => ({
   listings: many(listings),
 }))
+
+export const modsRelations = relations(mods, ({ many }) => ({
+  listings: many(listings),
+}))
+
+export const resourcesRelations = relations(resources, ({ many }) => ({
+  listings: many(listings),
+}))
+
+export const taxiListingsRelations = relations(taxiListings, ({ one }) => ({
+  user: one(user, { fields: [taxiListings.userId], references: [user.id] }),
+}))
+
 
 export const conversationsRelations = relations(conversations, ({ one, many }) => ({
   user1: one(user, { fields: [conversations.user1Id], references: [user.id] }),

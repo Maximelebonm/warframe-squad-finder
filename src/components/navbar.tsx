@@ -96,6 +96,7 @@ useEffect(() => {
     <nav className="border-b px-6 py-3 flex items-center justify-between">
       <div className="flex items-center gap-6">
         <Link to="/" className="font-bold text-lg">WSF</Link>
+        
         {mounted && session && (
           <>
           <Link
