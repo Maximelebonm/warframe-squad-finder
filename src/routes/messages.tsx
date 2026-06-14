@@ -25,10 +25,7 @@ function MessagesPage() {
   if (!isPending && !session) {
     router.navigate({ to: '/login' })
   }
-}, [session, isPending])
-
-if (isPending) return <div className="p-8">Chargement...</div>
-if (!session) return null
+  }, [session, isPending])
 
   useEffect(() => {
   if (!recipientId) return
@@ -36,7 +33,10 @@ if (!session) return null
     setSelectedConvId(conversationId)
     queryClient.invalidateQueries({ queryKey: ['conversations'] })
   })
-}, [recipientId])
+  }, [recipientId])
+
+
+
 
   const { data: convList } = useQuery({
     queryKey: ['conversations'],
@@ -44,16 +44,20 @@ if (!session) return null
     refetchInterval: 5000,
   })
 
-  const { data: msgs } = useQuery({
-    queryKey: ['messages', selectedConvId],
-    queryFn: () => fetchMessages({ data: selectedConvId! }),
-    enabled: selectedConvId !== null,
-    refetchInterval: 3000,
-  })
+const { data: msgs } = useQuery({
+  queryKey: ['messages', selectedConvId],
+  queryFn: async () => {
+    const result = await fetchMessages({ data: selectedConvId! })
+    queryClient.invalidateQueries({ queryKey: ['unread-count'] })
+    return result
+  },
+  enabled: selectedConvId !== null,
+  refetchInterval: 3000,
+})
 
   const sendMutation = useMutation({
     mutationFn: (data: { recipientId: string; content: string }) =>
-      sendMessage({ data }),
+    sendMessage({ data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['messages', selectedConvId], refetchType: 'all' })
       queryClient.invalidateQueries({ queryKey: ['conversations'], refetchType: 'all' })
@@ -74,6 +78,9 @@ if (!session) return null
     if (!other) return
     sendMutation.mutate({ recipientId: other.id, content: content.trim() })
   }
+
+  if (isPending) return <div className="p-8">Chargement...</div>
+  if (!session) return null
 
   return (
     <div className="max-w-5xl mx-auto p-8">
@@ -96,7 +103,10 @@ if (!session) return null
                 return (
                   <button
                     key={conv.id}
-                    onClick={() => setSelectedConvId(conv.id)}
+                    onClick={() => {
+                      setSelectedConvId(conv.id)
+                      queryClient.invalidateQueries({ queryKey: ['unread-count'] })
+                    }}
                     className={`w-full text-left px-4 py-3 hover:bg-muted transition-colors border-b ${isSelected ? 'bg-muted' : ''}`}
                   >
                     <p className="font-medium text-sm">

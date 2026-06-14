@@ -104,15 +104,17 @@ useEffect(() => {
           >
             Mes annonces
           </Link>
-            <Link
+          <Link
             search={{}}
             to="/messages"
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors gap-1.5"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5"
           >
             Mes messages
+            
             {unread && unread.count > 0 && (
               <span className="inline-flex items-center justify-center w-4 h-4 text-[10px] font-bold bg-red-500 text-white rounded-full">
                 {unread.count > 9 ? '9+' : unread.count}
+         
               </span>
             )}
           </Link>

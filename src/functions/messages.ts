@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { db } from '../db'
 import { conversations, messages } from '../db/schema'
-import { eq, or, and } from 'drizzle-orm'
+import { eq, or, and, isNull, not } from 'drizzle-orm'
 import { auth } from '../lib/auth'
 import { getRequest } from '@tanstack/react-start/server'
 
@@ -40,14 +40,15 @@ export const fetchMessages = createServerFn({ method: 'GET' })
 
     // Marquer les messages comme lus
     await db
-      .update(messages)
-      .set({ readAt: new Date() })
-      .where(
-        and(
-          eq(messages.conversationId, conversationId),
-          eq(messages.readAt, null as any),
-        )
-      )
+  .update(messages)
+  .set({ readAt: new Date() })
+  .where(
+       and(
+      eq(messages.conversationId, conversationId),
+      isNull(messages.readAt),
+      not(eq(messages.senderId, session.user.id)),
+    )
+  )
 
     return await db.query.messages.findMany({
       where: eq(messages.conversationId, conversationId),
@@ -113,21 +114,24 @@ export const fetchUnreadCount = createServerFn({ method: 'GET' })
     const session = await auth.api.getSession({ headers: request.headers })
     if (!session) return { count: 0 }
 
-    const result = await db.query.messages.findMany({
-      where: and(
-        eq(messages.readAt, null as any),
+    const result = await db.query.conversations.findMany({
+      where: or(
+        eq(conversations.user1Id, session.user.id),
+        eq(conversations.user2Id, session.user.id)
       ),
       with: {
-        conversation: true,
+        messages: {
+          where: isNull(messages.readAt),
+        },
       },
     })
 
-    const unread = result.filter(
-      m => m.senderId !== session.user.id &&
-      (m.conversation.user1Id === session.user.id || m.conversation.user2Id === session.user.id)
-    )
+    const count = result.reduce((acc, conv) => {
+      const unread = conv.messages.filter(m => m.senderId !== session.user.id)
+      return acc + unread.length
+    }, 0)
 
-    return { count: unread.length }
+    return { count }
   })
 
   export const getOrCreateConversation = createServerFn({ method: 'POST' })
