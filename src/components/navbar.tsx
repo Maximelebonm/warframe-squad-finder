@@ -96,7 +96,15 @@ useEffect(() => {
     <nav className="border-b px-6 py-3 flex items-center justify-between">
       <div className="flex items-center gap-6">
         <Link to="/" className="font-bold text-lg">WSF</Link>
-        
+        <Link
+            to="/taxi"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Taxi
+          </Link>
+      </div>
+
+      <div className="flex items-center gap-3">
         {mounted && session && (
           <>
           <Link
@@ -121,9 +129,6 @@ useEffect(() => {
           </Link>
           </>
         )}
-      </div>
-
-      <div className="flex items-center gap-3">
         {session && profile && (
           <div className="flex items-center gap-2">
             {/* Indicateur statut */}

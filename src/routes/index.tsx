@@ -61,7 +61,7 @@ function HomePage() {
   })
 
   function getItemName(listing: any) {
-    return listing.relic?.name ?? listing.mod?.name ?? listing.resource?.name ?? '?'
+    return listing.relic?.name ?? listing.mod?.name ?? listing.resource?.name ?? ''
   }
 
   return (
@@ -224,8 +224,8 @@ function ListingRow({ listing, alias, itemName, session }: {
           )}
           <span className="ml-2 text-sm text-muted-foreground">{alias}</span>
           {listing.category === 'relic' && listing.quantity && (
-  <span className="ml-2 text-sm text-muted-foreground">x{listing.quantity}</span>
-)}
+            <span className="ml-2 text-sm text-muted-foreground">x{listing.quantity}</span>
+          )}
 
           {listing.note && (
             <p className="text-sm text-muted-foreground mt-1">{listing.note}</p>

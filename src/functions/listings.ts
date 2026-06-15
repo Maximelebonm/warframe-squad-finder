@@ -198,3 +198,47 @@ export const updateListing = createServerFn({ method: 'POST' })
 
     return { success: true }
   })
+
+
+// Récupérer les taxis disponibles
+export const fetchTaxiListings = createServerFn({ method: 'GET' })
+  .validator(() => undefined)
+  .handler(async () => {
+    const now = new Date()
+
+    const result = await db.query.listings.findMany({
+      where: and(
+        eq(listings.category, 'taxi'),
+        eq(listings.isActive, true)
+      ),
+      with: {
+        user: { with: { profile: true } },
+      },
+      orderBy: (table, { desc }) => [desc(table.createdAt)],
+    })
+
+    return result.map(listing => {
+      const expiresAt = listing.user.profile.statusExpiresAt
+      if (expiresAt && expiresAt < now) {
+        listing.user.profile.status = 'offline'
+        listing.user.profile.statusExpiresAt = null
+      }
+      return listing
+    })
+  })
+
+// Récupérer mon listing taxi
+export const fetchMyTaxiListing = createServerFn({ method: 'GET' })
+  .validator(() => undefined)
+  .handler(async () => {
+    const request = getRequest()
+    const session = await auth.api.getSession({ headers: request.headers })
+    if (!session) return null
+
+    return await db.query.listings.findFirst({
+      where: and(
+        eq(listings.userId, session.user.id),
+        eq(listings.category, 'taxi')
+      ),
+    })
+  })

@@ -84,12 +84,25 @@ export const listings = pgTable('listings', {
   relicId: integer('relic_id').references(() => relics.id),
   modId: integer('mod_id').references(() => mods.id),
   resourceId: integer('resource_id').references(() => resources.id),          // 'have' | 'want'
-  quality: text(),                   // intact/exceptional/flawless/radiant (relics only)
+  quality: text(),             
   quantity: integer().default(1),
   isActive: boolean('is_active').default(true),
   note: text(),
   createdAt: timestamp('created_at').defaultNow(),
 })
+
+export const taxiListings = pgTable('taxi_listings', {
+  id: serial().primaryKey(),
+  userId: text('user_id').notNull().unique().references(() => user.id, { onDelete: 'cascade' }),
+  steelPath: boolean('steel_path').default(false),
+  isAvailable: boolean('is_available').default(false),
+  note: text(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+})
+
+export const taxiListingsRelations = relations(taxiListings, ({ one }) => ({
+  user: one(user, { fields: [taxiListings.userId], references: [user.id] }),
+}))
 
 export const listingCategories = pgTable('listing_categories', {
   id: serial().primaryKey(),
@@ -97,14 +110,6 @@ export const listingCategories = pgTable('listing_categories', {
   label: text().notNull(),           // 'Reliques', 'Mods', 'Ressources', 'Taxi'
 })
 
-export const taxiListings = pgTable('taxi_listings', {
-  id: serial().primaryKey(),
-  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
-  steelPath: boolean('steel_path').default(false),
-  isAvailable: boolean('is_available').default(false),
-  note: text(),
-  updatedAt: timestamp('updated_at').defaultNow(),
-})
 
 // Messagerie
 export const conversations = pgTable('conversations', {
@@ -161,10 +166,6 @@ export const modsRelations = relations(mods, ({ many }) => ({
 
 export const resourcesRelations = relations(resources, ({ many }) => ({
   listings: many(listings),
-}))
-
-export const taxiListingsRelations = relations(taxiListings, ({ one }) => ({
-  user: one(user, { fields: [taxiListings.userId], references: [user.id] }),
 }))
 
 
