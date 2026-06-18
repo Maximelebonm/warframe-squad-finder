@@ -116,7 +116,7 @@ function ProfilePage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="w-full max-w-md p-8 space-y-10">
+      <div className="w-full max-w-2xl p-8 space-y-10">
 
         {/* Profil Warframe */}
         <section className="space-y-4">
