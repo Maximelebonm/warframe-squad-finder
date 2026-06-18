@@ -100,7 +100,7 @@ function MyListingsPage() {
 
   if (!profile?.warframeAlias) {
     return (
-      <div className="max-w-3xl mx-auto p-8 space-y-4">
+      <div className="max-w-4xl mx-auto p-8 space-y-4">
         <h1 className="text-3xl font-bold">Mes annonces</h1>
         <div className="border rounded-lg p-6 space-y-4 text-center">
           <p className="text-muted-foreground">Tu dois configurer ton profil avant de créer des annonces.</p>
@@ -111,7 +111,7 @@ function MyListingsPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-8 space-y-10">
+    <div className="w-full max-w-4xl mx-auto p-8 space-y-10">
       <h1 className="text-3xl font-bold">Mes annonces</h1>
 
       <div className="border rounded-lg p-6 space-y-4">

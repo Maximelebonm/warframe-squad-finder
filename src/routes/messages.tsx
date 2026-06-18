@@ -83,7 +83,7 @@ const { data: msgs } = useQuery({
   if (!session) return null
 
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="w-full max-w-4xl mx-auto p-8">
       <h1 className="text-3xl font-bold mb-6">Messages</h1>
 
       <div className="border rounded-lg flex h-[600px]">
