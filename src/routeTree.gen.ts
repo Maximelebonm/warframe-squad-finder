@@ -17,6 +17,9 @@ import { Route as MyListingsRouteImport } from './routes/my-listings'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LegalMentionsLegalesRouteImport } from './routes/legal/mentions-legales'
+import { Route as LegalCookiesRouteImport } from './routes/legal/cookies'
+import { Route as LegalConfidentialiteRouteImport } from './routes/legal/confidentialite'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const TaxiRoute = TaxiRouteImport.update({
@@ -59,6 +62,21 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LegalMentionsLegalesRoute = LegalMentionsLegalesRouteImport.update({
+  id: '/legal/mentions-legales',
+  path: '/legal/mentions-legales',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalCookiesRoute = LegalCookiesRouteImport.update({
+  id: '/legal/cookies',
+  path: '/legal/cookies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalConfidentialiteRoute = LegalConfidentialiteRouteImport.update({
+  id: '/legal/confidentialite',
+  path: '/legal/confidentialite',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -74,6 +92,9 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/taxi': typeof TaxiRoute
+  '/legal/confidentialite': typeof LegalConfidentialiteRoute
+  '/legal/cookies': typeof LegalCookiesRoute
+  '/legal/mentions-legales': typeof LegalMentionsLegalesRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
@@ -85,6 +106,9 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/taxi': typeof TaxiRoute
+  '/legal/confidentialite': typeof LegalConfidentialiteRoute
+  '/legal/cookies': typeof LegalCookiesRoute
+  '/legal/mentions-legales': typeof LegalMentionsLegalesRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
@@ -97,6 +121,9 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/taxi': typeof TaxiRoute
+  '/legal/confidentialite': typeof LegalConfidentialiteRoute
+  '/legal/cookies': typeof LegalCookiesRoute
+  '/legal/mentions-legales': typeof LegalMentionsLegalesRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
@@ -110,6 +137,9 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/taxi'
+    | '/legal/confidentialite'
+    | '/legal/cookies'
+    | '/legal/mentions-legales'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -121,6 +151,9 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/taxi'
+    | '/legal/confidentialite'
+    | '/legal/cookies'
+    | '/legal/mentions-legales'
     | '/api/auth/$'
   id:
     | '__root__'
@@ -132,6 +165,9 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/taxi'
+    | '/legal/confidentialite'
+    | '/legal/cookies'
+    | '/legal/mentions-legales'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
@@ -144,6 +180,9 @@ export interface RootRouteChildren {
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   TaxiRoute: typeof TaxiRoute
+  LegalConfidentialiteRoute: typeof LegalConfidentialiteRoute
+  LegalCookiesRoute: typeof LegalCookiesRoute
+  LegalMentionsLegalesRoute: typeof LegalMentionsLegalesRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -205,6 +244,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/legal/mentions-legales': {
+      id: '/legal/mentions-legales'
+      path: '/legal/mentions-legales'
+      fullPath: '/legal/mentions-legales'
+      preLoaderRoute: typeof LegalMentionsLegalesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/cookies': {
+      id: '/legal/cookies'
+      path: '/legal/cookies'
+      fullPath: '/legal/cookies'
+      preLoaderRoute: typeof LegalCookiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/confidentialite': {
+      id: '/legal/confidentialite'
+      path: '/legal/confidentialite'
+      fullPath: '/legal/confidentialite'
+      preLoaderRoute: typeof LegalConfidentialiteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -224,6 +284,9 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   TaxiRoute: TaxiRoute,
+  LegalConfidentialiteRoute: LegalConfidentialiteRoute,
+  LegalCookiesRoute: LegalCookiesRoute,
+  LegalMentionsLegalesRoute: LegalMentionsLegalesRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
