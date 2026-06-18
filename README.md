@@ -1,289 +1,84 @@
-Welcome to your new TanStack Start app! 
+# Warframe Squad Finder
 
-# Getting Started
+Warframe Squad Finder (WSF) est une plateforme communautaire qui aide les joueurs de Warframe à se trouver pour farmer des reliques, échanger des mods et ressources, ou organiser des taxis pour les missions difficiles.
 
-To run this application:
+🔗 [warframe-squad-finder.com](https://warframe-squad-finder.com)
 
-```bash
-pnpm install
-pnpm dev
-```
+## Le concept
 
-# Building For Production
+Warframe est un jeu coopératif, mais trouver des coéquipiers pour une relique précise ou une mission spécifique reste souvent compliqué en dehors du jeu. WSF résout ce problème en offrant un espace dédié où les joueurs peuvent :
 
-To build this application for production:
+- **Publier des annonces** pour les reliques, mods ou ressources qu'ils possèdent ou recherchent
+- **Se proposer comme taxi** pour aider d'autres joueurs sur des missions ou nœuds difficiles (avec ou sans Steel Path)
+- **Indiquer leur disponibilité** en temps réel (hors ligne, en ligne, disponible)
+- **Échanger directement** via une messagerie intégrée, sans avoir à se contacter en dehors de la plateforme
 
-```bash
-pnpm build
-```
+## Fonctionnalités
 
-## Testing
+- Authentification sécurisée avec vérification d'email et réinitialisation de mot de passe
+- Recherche et filtrage d'annonces par catégorie (reliques, mods, ressources)
+- Système de taxi dédié pour l'entraide entre joueurs expérimentés et débutants
+- Statut de disponibilité avec minuteur automatique
+- Messagerie intégrée entre joueurs
+- Gestion complète du profil (alias Warframe, plateforme, sécurité du compte)
 
-This project uses [Vitest](https://vitest.dev/) for testing. You can run the tests with:
+## Stack technique
 
-```bash
-pnpm test
-```
+- [TanStack Start](https://tanstack.com/start) — framework fullstack React
+- [Drizzle ORM](https://orm.drizzle.team/) avec [Neon](https://neon.tech/) (PostgreSQL serverless)
+- [Better Auth](https://www.better-auth.com/) pour l'authentification
+- [Resend](https://resend.com/) pour l'envoi d'emails transactionnels
+- [Tailwind CSS](https://tailwindcss.com/) pour le design
+- Déployé sur [Vercel](https://vercel.com/)
 
-## Styling
+## Développement local
 
-This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
+### Prérequis
 
-### Removing Tailwind CSS
+- Node.js 18+
+- Une base de données PostgreSQL (Neon recommandé)
+- Un compte [Resend](https://resend.com/) pour l'envoi d'emails
 
-If you prefer not to use Tailwind CSS:
-
-1. Remove the demo pages in `src/routes/demo/`
-2. Replace the Tailwind import in `src/styles.css` with your own styles
-3. Remove `tailwindcss()` from the plugins array in `vite.config.ts`
-4. Uninstall the packages: `pnpm add @tailwindcss/vite tailwindcss --dev`
-
-## Linting & Formatting
-
-
-This project uses [eslint](https://eslint.org/) and [prettier](https://prettier.io/) for linting and formatting. Eslint is configured using [tanstack/eslint-config](https://tanstack.com/config/latest/docs/eslint). The following scripts are available:
+### Installation
 
 ```bash
-pnpm lint
-pnpm format
-pnpm check
+git clone https://github.com/Maximelebonm/warframe-squad-finder.git
+cd warframe-squad-finder
+npm install
 ```
 
+### Variables d'environnement
 
-## Deploy with Nitro
-
-This project uses Nitro as a generic server adapter, so it can run on any Node-compatible host.
+Copie le fichier `.env.example` en `.env.local` et renseigne les valeurs :
 
 ```bash
-npm run build
-node dist/server/index.mjs
+cp .env.example .env.local
 ```
 
-The build output is a self-contained Node server. To deploy, push the `dist/` directory to your host (Render, Fly.io, your own VPS, etc.) and run the server command above.
-
-For host-specific presets (Vercel, Netlify, Cloudflare, AWS Lambda, etc.) and tuning, see https://v3.nitro.build/deploy.
-
-
-## T3Env
-
-- You can use T3Env to add type safety to your environment variables.
-- Add Environment variables to the `src/env.mjs` file.
-- Use the environment variables in your code.
-
-### Usage
-
-```ts
-import { env } from "#/env";
-
-console.log(env.VITE_APP_TITLE);
+```dotenv
+DATABASE_URL=
+DATABASE_URL_POOLER=
+BETTER_AUTH_SECRET=
+BETTER_AUTH_URL=
+RESEND_API_KEY=
 ```
 
+### Base de données
 
-
-
-
-## Shadcn
-
-Add components using the latest version of [Shadcn](https://ui.shadcn.com/).
+Applique le schéma à ta base de données :
 
 ```bash
-pnpm dlx shadcn@latest add button
+npx drizzle-kit push
 ```
 
-
-## Setting up Neon
-
-When running the `dev` command, `vite-plugin-neon-new` will identify there is not a database setup. It will then create and seed a claimable database.
-
-It is the same process as [Neon Launchpad](https://neon.new).
-
-> [!IMPORTANT]  
-> Claimable databases expire in 72 hours.
-
-
-## Setting up Better Auth
-
-1. Generate and set the `BETTER_AUTH_SECRET` environment variable in your `.env.local`:
-
-   ```bash
-   pnpm dlx @better-auth/cli secret
-   ```
-
-2. Visit the [Better Auth documentation](https://www.better-auth.com) to unlock the full potential of authentication in your app.
-
-### Adding a Database (Optional)
-
-Better Auth can work in stateless mode, but to persist user data, add a database:
-
-```typescript
-// src/lib/auth.ts
-import { betterAuth } from "better-auth";
-import { Pool } from "pg";
-
-export const auth = betterAuth({
-  database: new Pool({
-    connectionString: process.env.DATABASE_URL,
-  }),
-  // ... rest of config
-});
-```
-
-Then run migrations:
+### Lancer le projet
 
 ```bash
-pnpm dlx @better-auth/cli migrate
+npm run dev
 ```
 
+Le site est accessible sur `http://localhost:3000`.
 
+## Avertissement
 
-## Routing
-
-This project uses [TanStack Router](https://tanstack.com/router) with file-based routing. Routes are managed as files in `src/routes`.
-
-### Adding A Route
-
-To add a new route to your application just add a new file in the `./src/routes` directory.
-
-TanStack will automatically generate the content of the route file for you.
-
-Now that you have two routes you can use a `Link` component to navigate between them.
-
-### Adding Links
-
-To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
-
-```tsx
-import { Link } from "@tanstack/react-router";
-```
-
-Then anywhere in your JSX you can use it like so:
-
-```tsx
-<Link to="/about">About</Link>
-```
-
-This will create a link that will navigate to the `/about` route.
-
-More information on the `Link` component can be found in the [Link documentation](https://tanstack.com/router/v1/docs/framework/react/api/router/linkComponent).
-
-### Using A Layout
-
-In the File Based Routing setup the layout is located in `src/routes/__root.tsx`. Anything you add to the root route will appear in all the routes. The route content will appear in the JSX where you render `{children}` in the `shellComponent`.
-
-Here is an example layout that includes a header:
-
-```tsx
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
-
-export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      { charSet: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'My App' },
-    ],
-  }),
-  shellComponent: ({ children }) => (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        <header>
-          <nav>
-            <Link to="/">Home</Link>
-            <Link to="/about">About</Link>
-          </nav>
-        </header>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  ),
-})
-```
-
-More information on layouts can be found in the [Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
-
-## Server Functions
-
-TanStack Start provides server functions that allow you to write server-side code that seamlessly integrates with your client components.
-
-```tsx
-import { createServerFn } from '@tanstack/react-start'
-
-const getServerTime = createServerFn({
-  method: 'GET',
-}).handler(async () => {
-  return new Date().toISOString()
-})
-
-// Use in a component
-function MyComponent() {
-  const [time, setTime] = useState('')
-  
-  useEffect(() => {
-    getServerTime().then(setTime)
-  }, [])
-  
-  return <div>Server time: {time}</div>
-}
-```
-
-## API Routes
-
-You can create API routes by using the `server` property in your route definitions:
-
-```tsx
-import { createFileRoute } from '@tanstack/react-router'
-import { json } from '@tanstack/react-start'
-
-export const Route = createFileRoute('/api/hello')({
-  server: {
-    handlers: {
-      GET: () => json({ message: 'Hello, World!' }),
-    },
-  },
-})
-```
-
-## Data Fetching
-
-There are multiple ways to fetch data in your application. You can use TanStack Query to fetch data from a server. But you can also use the `loader` functionality built into TanStack Router to load the data for a route before it's rendered.
-
-For example:
-
-```tsx
-import { createFileRoute } from '@tanstack/react-router'
-
-export const Route = createFileRoute('/people')({
-  loader: async () => {
-    const response = await fetch('https://swapi.dev/api/people')
-    return response.json()
-  },
-  component: PeopleComponent,
-})
-
-function PeopleComponent() {
-  const data = Route.useLoaderData()
-  return (
-    <ul>
-      {data.results.map((person) => (
-        <li key={person.name}>{person.name}</li>
-      ))}
-    </ul>
-  )
-}
-```
-
-Loaders simplify your data fetching logic dramatically. Check out more information in the [Loader documentation](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#loader-parameters).
-
-# Demo files
-
-Files prefixed with `demo` can be safely deleted. They are there to provide a starting point for you to play around with the features you've installed.
-
-# Learn More
-
-You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).
-
-For TanStack Start specific documentation, visit [TanStack Start](https://tanstack.com/start).
+Ce projet n'est pas affilié à Digital Extremes. Warframe est une marque déposée de Digital Extremes Ltd.

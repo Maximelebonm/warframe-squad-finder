@@ -173,7 +173,8 @@ function MyListingsPage() {
         )}
 
         {/* Quantité */}
-        {category === 'relic' &&        <div className="space-y-2">
+        {category === 'relic' &&        
+        <div className="space-y-2">
           <Label>Quantité ouvrable</Label>
           <Input
             type="number"

@@ -6,6 +6,7 @@ import { updateStatus, getProfile } from '#/functions/profile'
 import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { fetchUnreadCount } from '#/functions/messages'
+import { UserRound,Mail,CarTaxiFront,Megaphone    } from 'lucide-react';
 
 
 export function Navbar() {
@@ -94,23 +95,30 @@ useEffect(() => {
 
    return (
     <nav className="border-b px-6 py-3 flex items-center justify-between">
-      <div className="flex items-center gap-6">
-        <Link to="/" className="font-bold text-lg">WSF</Link>
-        <Link
-            to="/taxi"
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Taxi
-          </Link>
-      </div>
+     <div className="flex items-center gap-6 ">
+      <Link to="/" className="font-bold text-lg">        
+      <img
+          src={`/images/logowsf.png`}
+          alt={"logowsf.png"}
+          className="w-auto h-8 object-contain"
+        /></Link>
+      <Link
+        to="/taxi"
+        className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5"
+      >
+        <CarTaxiFront />
+        Taxi
+      </Link>
+    </div>
 
       <div className="flex items-center gap-3">
         {mounted && session && (
           <>
           <Link
             to="/my-listings"
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5"
           >
+            <Megaphone />
             Mes annonces
           </Link>
           <Link
@@ -118,6 +126,7 @@ useEffect(() => {
             to="/messages"
             className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5"
           >
+            <Mail/>
             Mes messages
             
             {unread && unread.count > 0 && (
@@ -129,88 +138,143 @@ useEffect(() => {
           </Link>
           </>
         )}
-        {session && profile && (
-          <div className="flex items-center gap-2">
-            {/* Indicateur statut */}
-            <span className="flex items-center gap-1.5 text-sm">
-              <span className={`w-2 h-2 rounded-full ${statusConfig[currentStatus as keyof typeof statusConfig].color || 'bg-gray-400'}`} />
-              {statusConfig[currentStatus as keyof typeof statusConfig].label || currentStatus}
-              {timeLeft !== null && timeLeft > 0 && (
-                <span className="text-xs text-muted-foreground">({formatTime(timeLeft)})</span>
-              )}
-            </span>
-
-            {/* Sélecteur durée */}
-            {currentStatus === 'offline' && (
-              <Select value={duration} onValueChange={setDuration}>
-                <SelectTrigger className="h-8 w-20 text-xs">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="30">30min</SelectItem>
-                  <SelectItem value="60">1h</SelectItem>
-                  <SelectItem value="120">2h</SelectItem>
-                  <SelectItem value="180">3h</SelectItem>
-                  <SelectItem value="240">4h</SelectItem>
-                </SelectContent>
-              </Select>
-            )}
-
-            {/* Boutons statut */}
-            {currentStatus === 'offline' ? (
-              <div className="flex gap-1">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="h-8 text-xs"
-                  onClick={() => statusMutation.mutate({ status: 'online', duration: parseInt(duration) })}
-                >
-                  En ligne
-                </Button>
-                <Button
-                  size="sm"
-                  className="h-8 text-xs bg-green-600 hover:bg-green-700"
-                  onClick={() => statusMutation.mutate({ status: 'available', duration: parseInt(duration) })}
-                >
-                  Disponible
-                </Button>
-              </div>
-            ) : (
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-8 text-xs"
-                onClick={() => statusMutation.mutate({ status: 'offline' })}
-              >
-                Se déconnecter
-              </Button>
-            )}
-          </div>
-        )}
-
-        {mounted && session ? (
-          <>
-            <Link
-              to="/profile"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {session.user.name}
-            </Link>
-            <Button variant="outline" size="sm" onClick={handleLogout}>
-              Déconnexion
-            </Button>
-          </>
-        ) : (
-          <>
-            <Link to="/login">
-              <Button variant="outline" size="sm">Connexion</Button>
-            </Link>
-            <Link to="/register">
-              <Button size="sm">S'inscrire</Button>
-            </Link>
-          </>
-        )}
+{mounted && session && profile ? (
+  <ProfileMenu
+    session={session}
+    profile={profile}
+    currentStatus={currentStatus}
+    timeLeft={timeLeft}
+    duration={duration}
+    setDuration={setDuration}
+    statusMutation={statusMutation}
+    formatTime={formatTime}
+    statusConfig={statusConfig}
+    handleLogout={handleLogout}
+  />
+) : (
+  <>
+    <Link to="/login">
+      <Button variant="outline" size="sm">Connexion</Button>
+    </Link>
+    <Link to="/register">
+      <Button size="sm">S'inscrire</Button>
+    </Link>
+  </>
+)}
       </div>
     </nav>
+  )
+}
+
+function ProfileMenu({
+  session,
+  profile,
+  currentStatus,
+  timeLeft,
+  duration,
+  setDuration,
+  statusMutation,
+  formatTime,
+  statusConfig,
+  handleLogout,
+}: any) {
+  const [open, setOpen] = useState(false)
+  const [pendingStatus, setPendingStatus] = useState<'offline' | 'online' | 'available'>(currentStatus)
+
+  function selectStatus(status: 'offline' | 'online' | 'available') {
+    setPendingStatus(status)
+    if (status === 'offline') {
+      statusMutation.mutate({ status: 'offline' })
+    } else {
+      statusMutation.mutate({ status, duration: parseInt(duration || '30') })
+    }
+  }
+  
+  return (
+    <div
+      className="relative"
+      onMouseEnter={() => { setOpen(true); setPendingStatus(currentStatus) }}
+      onMouseLeave={() => setOpen(false)}
+    >
+      {/* Trigger */}
+      <button className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors py-2">
+        <span className={`w-2 h-2 rounded-full ${statusConfig[currentStatus]?.color || 'bg-gray-400'}`} />
+        {session.user.name}
+        {timeLeft !== null && timeLeft > 0 && (
+          <span className="text-xs text-muted-foreground">({formatTime(timeLeft)})</span>
+        )}
+        <svg className={`w-3 h-3 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {/* Dropdown */}
+      {open && (
+        <div className="absolute right-0 top-full pt-1 z-50">
+          <div className="bg-card border rounded-lg shadow-lg p-3 w-56 space-y-3">
+
+            {/* Étape 1 : choix du statut */}
+            <div className="space-y-1">
+              {(['offline', 'online', 'available'] as const).map((status) => (
+                <button
+                  key={status}
+                  onClick={() => selectStatus(status)}
+                  className={`w-full text-left px-2 py-1.5 rounded text-sm flex items-center gap-2 transition-colors hover:bg-muted ${
+                    pendingStatus === status ? 'bg-muted font-medium' : ''
+                  }`}
+                >
+                  <span className={`w-2 h-2 rounded-full ${statusConfig[status].color}`} />
+                  {statusConfig[status].label}
+                </button>
+              ))}
+            </div>
+
+            <hr />
+
+            {/* Étape 2 : durée, grisée si offline */}
+ <div className={pendingStatus === 'offline' ? 'opacity-40 pointer-events-none space-y-2' : 'space-y-2'}>
+  <div className="flex items-center justify-between gap-1">
+    {(['30', '60', '120', '180', '240'] as const).map((d) => {
+      const labels: Record<string, string> = { '30': '30min', '60': '1h', '120': '2h', '180': '3h', '240': '4h' }
+      const isSelected = duration === d
+      return (
+        <button
+          key={d}
+          onClick={() => {
+            setDuration(d)
+            if (pendingStatus !== 'offline') {
+              statusMutation.mutate({ status: pendingStatus, duration: parseInt(d) })
+            }
+          }}
+          disabled={pendingStatus === 'offline'}
+          className={`flex-1 text-[10px] py-1.5 rounded transition-colors ${
+            isSelected
+              ? 'bg-primary text-primary-foreground font-medium'
+              : 'bg-muted text-muted-foreground hover:bg-muted/70'
+          }`}
+        >
+          {labels[d]}
+        </button>
+      )
+    })}
+  </div>
+</div>
+
+            <hr />
+
+            <Link
+              to="/profile"
+              className="block text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Mon profil
+            </Link>
+
+            <Button variant="outline" size="sm" className="w-full" onClick={handleLogout}>
+              Déconnexion
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }

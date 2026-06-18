@@ -1,11 +1,10 @@
-import { createFileRoute, useNavigate, useRouter, Link } from '@tanstack/react-router'
+import { createFileRoute, useNavigate, Link } from '@tanstack/react-router'
 import { useState } from 'react'
-import { MessageCircle, Copy, Check, Mail } from 'lucide-react'
+import { MessageCircle, Copy, Check, Mail,ChevronRight  } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { searchRelics, searchMods, searchResources, getListings, fetchRecentListings } from '#/functions/listings'
 import { Input } from '#/components/ui/input'
 import { Button } from '#/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '#/components/ui/select'
 import { authClient } from '#/lib/auth-client'
 
 type Category = 'relic' | 'mod' | 'resource'
@@ -66,30 +65,42 @@ function HomePage() {
 
   return (
     <div className="max-w-3xl mx-auto p-8 space-y-6">
-      <div>
+    <div>
+      <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Warframe Squad Finder</h1>
-        <p className="text-muted-foreground mt-2">Trouve des joueurs pour farmer ensemble</p>
+          <Link className="flex gap-1 text-sm items-center " to='/taxi'>Trouver un taxi<ChevronRight className='text-sm h-4'/></Link>
       </div>
+      <p className="text-muted-foreground mt-2">Trouve des joueurs pour farmer ensemble</p>
+    </div>
 
       {/* Catégorie + Recherche */}
-      <div className="flex gap-2">
-        <Select value={category} onValueChange={(v) => { setCategory(v as Category); setSelectedItem(null); setQuery('') }}>
-          <SelectTrigger className="w-36">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="relic">Relique</SelectItem>
-            <SelectItem value="mod">Mod</SelectItem>
-            <SelectItem value="resource">Ressource</SelectItem>
-          </SelectContent>
-        </Select>
-        <Input
-          placeholder={`Recherche ${category === 'relic' ? 'une relique... ex: Lith V6' : category === 'mod' ? 'un mod...' : 'une ressource...'}`}
-          value={query}
-          onChange={(e) => { setQuery(e.target.value); setSelectedItem(null) }}
-          className="flex-1"
+<div className="flex flex-col gap-2">
+  <div className="flex gap-2 max-w-md mb-10 mx-auto">
+    {(['relic', 'mod', 'resource'] as Category[]).map((cat) => (
+      <button
+        key={cat}
+        onClick={() => { setCategory(cat); setSelectedItem(null); setQuery('') }}
+        className={`flex-1 flex items-center justify-center aspect-square rounded-md overflow-hidden border-2 transition-all ${
+          category === cat
+            ? 'border-primary scale-105'
+            : 'border-transparent opacity-50 hover:opacity-80'
+        }`}
+      >
+        <img
+          src={`/images/${cat}.png`}
+          alt={cat}
+          className="w-auto h-full object-cover"
         />
-      </div>
+      </button>
+    ))}
+  </div>
+  <Input
+    placeholder={`Recherche ${category === 'relic' ? 'une relique... ex: Lith V6' : category === 'mod' ? 'un mod...' : 'une ressource...'}`}
+    value={query}
+    onChange={(e) => { setQuery(e.target.value); setSelectedItem(null) }}
+    className="flex-1"
+  />
+</div>
 
       {/* Résultats de recherche */}
       {searchResults && searchResults.length > 0 && !selectedItem && (
